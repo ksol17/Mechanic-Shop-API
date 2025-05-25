@@ -15,33 +15,6 @@ A RESTful API built with Flask for managing a mechanic shop. The system supports
 
 ---
 
-## 🗂️ Project Structure
-
-project_root/
-├── app.py # App entry point
-├── config.py # Configuration classes
-├── .venv # Environment variables
-├── app/
-│ ├── init.py # Application factory
-│ ├── extensions.py # db, ma instances
-│ ├── models.py # SQLAlchemy models
-│ └── blueprints/
-│     ├── customers/
-│           ├── init.py # Application factory
-│           ├── extensions.py # db, ma instances
-│           ├── models.py # SQLAlchemy models
-│     ├── mechanics/
-│           ├── init.py # Application factory
-│           ├── extensions.py # db, ma instances
-│           ├── models.py # SQLAlchemy models
-│     └── service_tickets/
-│           ├── init.py # Application factory
-│           ├── extensions.py # db, ma instances
-│           ├── models.py # SQLAlchemy models
-
-
----
-
 ## ⚙️ Setup Instructions
 
 ### 1. 🔧 Install Dependencies
