@@ -4,6 +4,14 @@ from app.extensions import db
 from app.models import ServiceTicket, Mechanic
 from . import service_tickets_bp
 from .schemas import ticket_schema, tickets_schema
+from app.blueprints.inventory.schemas import (
+    inventory_schema,
+    inventories_schema,
+    part_description_schema,
+    part_descriptions_schema,
+    serialized_part_schema,
+    serialized_parts_schema
+)
 
 # Create a new service ticket
 @service_tickets_bp.route('/', methods=['POST'])

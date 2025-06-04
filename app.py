@@ -5,10 +5,14 @@ app = create_app("DevelopmentConfig")
 
 
 with app.app_context():
-    db.create_all()
+    db.drop_all()  # Drop all tables if they exist
+
  
 
 
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
+
 
