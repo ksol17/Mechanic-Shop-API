@@ -1,4 +1,5 @@
-from app import db
+from app.extensions import db, ma, jwt, limiter, cache
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 class Customer(db.Model):

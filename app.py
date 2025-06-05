@@ -1,13 +1,10 @@
-from app import create_app
-from app.models import db   
-
-app = create_app("DevelopmentConfig")
+from app import create_app, db
 
 
-with app.app_context():
-    db.drop_all()  # Drop all tables if they exist
 
- 
+app = create_app()
+
+
 
 
 if __name__ == "__main__":

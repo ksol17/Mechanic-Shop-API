@@ -1,21 +1,20 @@
 from flask import request, jsonify
-from app.extensions import db
+from app.extensions import db, ma, jwt, limiter, cache
 from app.models import Mechanic
-from . import mechanics_bp
-from .schemas import mechanic_schema, mechanics_schema
+from app.blueprints.mechanics import mechanics_bp
+from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
 
 # Create a new mechanic
 @mechanics_bp.route('/', methods=['POST'])
 def create_mechanic():
     data = request.get_json()
-    try:
-        new_mechanic = mechanic_schema.load(data)
-        db.session.add(new_mechanic)
-        db.session.commit()
-        return mechanic_schema.jsonify(new_mechanic), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 400
+    mechanic = Mechanic(
+        name=data['name'],
+        email=data['email'],
+    )
+    db.session.add(mechanic)
+    db.session.commit()
+    return mechanic_schema.jsonify(mechanic), 201
 
 # Get all mechanics (with nested tickets)
 @mechanics_bp.route('/', methods=['GET'])
@@ -34,8 +33,8 @@ def get_mechanic(id):
 def update_mechanic(id):
     mechanic = Mechanic.query.get_or_404(id)
     data = request.get_json()
-    for field in ['name', 'email', 'phone', 'salary']:
-        setattr(mechanic, field, data.get(field, getattr(mechanic, field)))
+    mechanic.name = data.get('name', mechanic.name)
+    mechanic.email = data.get('email', mechanic.email)
     db.session.commit()
     return mechanic_schema.jsonify(mechanic)
 
@@ -45,4 +44,4 @@ def delete_mechanic(id):
     mechanic = Mechanic.query.get_or_404(id)
     db.session.delete(mechanic)
     db.session.commit()
-    return jsonify({"message": "Mechanic deleted successfully"})
+    return jsonify({"message": f"Mechanic {id} deleted successfully"})

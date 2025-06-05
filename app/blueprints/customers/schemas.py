@@ -2,6 +2,7 @@ from app import ma
 from app.models import Customer
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import EXCLUDE
+from app.extensions import db, ma, jwt, limiter, cache
 
 class CustomerSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
