@@ -1,19 +1,9 @@
 from flask import Flask
-from flask_marshmallow import Marshmallow
-from flask_sqlalchemy import SQLAlchemy
-from .extensions import db, ma
-from flask_jwt_extended import JWTManager
-from app.models import db
-from app.extensions import db, ma, jwt, limiter, cache
 from config import DevelopmentConfig
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-from config import DevelopmentConfig
+from app.extensions import db, ma, jwt, limiter, cache, migrate
+from app import models
 
-db = SQLAlchemy()
-ma = Marshmallow()
-jwt = JWTManager()
-limiter = Limiter(key_func=get_remote_address)
+
 
 def create_app(config_class=DevelopmentConfig):
     app = Flask(__name__)
@@ -28,6 +18,7 @@ def create_app(config_class=DevelopmentConfig):
     limiter.init_app(app)
     cache.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)
 
 
     # Register blueprints

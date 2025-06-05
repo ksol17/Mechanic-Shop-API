@@ -1,4 +1,4 @@
-from app.extensions import db, ma, jwt, limiter, cache
+from app.extensions import db
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
