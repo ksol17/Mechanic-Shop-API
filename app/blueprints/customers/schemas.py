@@ -9,7 +9,7 @@ class CustomerSchema(ma.SQLAlchemyAutoSchema):
         model = Customer
         load_instance = True
         include_fk = True
-        exclude = ("password",)
+        exclude = ("password")
 
 
 customer_schema = CustomerSchema()

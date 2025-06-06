@@ -36,23 +36,26 @@ def create_customer():
 
 
 # Login Route –  Authenticate customer and issues a JWT 
-@customers_bp.route("/login", methods=["POST"])
-def login_customer():
+@customers_bp.route('/login', methods=['POST'])
+def login():
     data = request.get_json()
-    errors = customer_login_schema.validate(data)
-    if errors:
-        return jsonify(errors), 400
+    email = data.get("email")
+    password = data.get("password")
+
+    customer = Customer.query.filter_by(email=email).first()
+
+    if not customer or not check_password_hash(customer.password, password):
+        return jsonify({"error": "Invalid email or password"}), 401
     
-    customer = Customer.query.filter_by(email=data['email']).first()
-    if customer and check_password_hash(customer.password, data['password']):
-        access_token = create_access_token(identity=customer.id)
+    access_token = create_access_token(identity=customer.id)
         
-        return jsonify({
+    return jsonify({
             "status": "success",
             "message": "Successfully logged in",
             "token": access_token,
         }), 200
-    return jsonify({"message": "Invalid email or password"}), 401
+    
+    
 
 
 # READ - Get paginated customers list (with caching)

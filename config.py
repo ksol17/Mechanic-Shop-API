@@ -1,15 +1,16 @@
-import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 load_dotenv()
 
+import os
+
+
 class DevelopmentConfig:
-    SQLALCHEMY_DATABASE_URI = os.getenv("mysql+mysqlconnector://root:Preciosa2016!@localhost/Mechanic_Shop")
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.getenv("dev-secret-key")
-    RATELIMIT_STORAGE_URL = os.getenv("redis://localhost:6379")
-
-
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    RATELIMIT_STORAGE_URL = os.getenv("RATELIMIT_STORAGE_URL")
+    
 class TestingConfig:
     pass
     
