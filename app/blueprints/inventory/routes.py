@@ -12,9 +12,8 @@ def create_inventory_item():
     item = Inventory(
         item_name = data['item_name'],
         quantity = data['quantity'],
-        price = data['price'],
-        description = data.get('description', '')
-    )
+        price = data['price'])
+    
     db.session.add(item)
     db.session.commit()
     return inventory_schema.jsonify(item), 201
@@ -39,7 +38,7 @@ def update_inventory_item(id):
     item.item_name = data.get('item_name', item.item_name)
     item.quantity = data.get('quantity', item.quantity)
     item.price = data.get('price', item.price)
-    item.description = data.get('description', item.description)
+    
     
     db.session.commit()
     return inventory_schema.jsonify(item)

@@ -1,40 +1,47 @@
-from flask import request, jsonify
+from flask import Blueprint,request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from functools import wraps
 from marshmallow import ValidationError
 from sqlalchemy import select
-from app.extensions import db, ma, jwt, limiter, cache
+from app.extensions import db, limiter, cache
 from app.blueprints.customers import customers_bp
 from app.blueprints.customers.schemas import customer_schema, customers_schema, customer_login_schema
 from app.utils.util import encode_token, token_required
 from app.models import Customer
-
-
+from flask_marshmallow import fields, Schema
 
 # Create a new customer
 @customers_bp.route('/', methods=['POST'])
 @limiter.limit("10 per hour")
 def create_customer():
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+    
+    name = data.get('name')
+    email = data.get('email')
+    phone = data.get('phone')
+    password = data.get('password')
+    if not all([name, email, phone, password]):
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    hashed_password = generate_password_hash(password)
+    new_customer = Customer(
+        name=name,
+        email=email,
+        phone=phone,
+        password=hashed_password
+    )
     try:
-
-        hashed_password = generate_password_hash(data['password'])
-        customer = Customer(
-            name=data['name'],
-            email=data['email'],
-            phone=data['phone'],
-            password=hashed_password
-        )
-        db.session.add(customer)
+        db.session.add(new_customer)
         db.session.commit()
-        return customer_schema.jsonify(customer), 201
+        return customer_schema.jsonify(new_customer), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)}), 500
 
-
-
+        
 # Login Route –  Authenticate customer and issues a JWT 
 @customers_bp.route('/login', methods=['POST'])
 def login():
@@ -82,9 +89,8 @@ def get_customer(id):
     return jsonify({"error": "Customer not found"}), 404
 
 
-# Update a customer (must be authenticated)
+# Update a customer 
 @customers_bp.route('/<int:id>', methods=['PUT'])
-@token_required
 def update_customer(customer_id, id):
     if customer_id != id:
         return jsonify({"message": "Unauthorized"}), 403
@@ -106,14 +112,9 @@ def update_customer(customer_id, id):
 
 
 
-# Delete a customer (authenticated)
+# Delete a customer 
 @customers_bp.route('/<int:id>', methods=['DELETE'])
-@jwt_required()
 def delete_customer(id):
-    current_user_id = get_jwt_identity()
-    if current_user_id != id:
-        return jsonify({"error": "Unauthorized to delete this account"}), 403
-    
     customer = Customer.query.get_or_404(id)
     db.session.delete(customer)
     db.session.commit()

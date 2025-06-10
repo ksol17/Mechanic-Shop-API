@@ -11,6 +11,9 @@ def create_mechanic():
     mechanic = Mechanic(
         name=data['name'],
         email=data['email'],
+        phone=data.get('phone'),
+        address=data.get('address'),
+        salary=data.get('salary')
     )
     db.session.add(mechanic)
     db.session.commit()

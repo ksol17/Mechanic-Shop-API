@@ -1,5 +1,5 @@
-from app.extensions import db, ma, jwt, limiter, cache
-from app.models import ServiceTicket, Mechanic
+from app.extensions import ma, jwt, limiter, cache
+from app.models import ServiceTicket
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 

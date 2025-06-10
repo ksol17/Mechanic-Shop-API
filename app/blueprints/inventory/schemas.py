@@ -1,4 +1,3 @@
-from app import ma
 from app.extensions import db, ma, jwt, limiter, cache
 from app.models import Inventory
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema

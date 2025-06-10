@@ -7,7 +7,7 @@ from flask import request, jsonify, current_app
 # It includes a function to encode a JWT token for user authentication.
 # The token includes expiration time, issued at time, and subject (user ID).
 # The token is signed with a secret key to ensure its integrity and authenticity.
-SECRET_KEY = "a super secret, secret key"
+SECRET_KEY = "super secret secrets"
 
 def encode_token(customer_id): #using unique pieces of info to make our tokens user specific
     payload = {
@@ -35,32 +35,24 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
         if 'Authorization' in request.headers:
-            auth_header = request.headers['Authorization']
-            parts = auth_header.split()
-            if len(parts) == 2 and parts[0] == 'Bearer':
-                token = parts[1]
+            token = request.headers['Authorization'].split()[1]
 
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
-
         try:
-            payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-            customer_id = payload['sub']
-        except jwt.ExpiredSignatureError:
-            return jsonify({'message': 'Token has expired'}), 401
-        except jwt.InvalidTokenError:
-            return jsonify({'message': 'Invalid token'}), 401
+            # decode the token
+            data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            customer_id = data['sub'] # Fetching the customer ID from the token
 
+        except jwt.exceptions.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired!'}), 401
+        except jwt.JWTError:
+            return jsonify({'message': 'Token is invalid!'}), 401
+        
         return f(customer_id, *args, **kwargs)
-
+        # Call the decorated function with the customer ID
+        # This allows the decorated function to access the customer ID for further processing.
     return decorated
 # This decorator checks for the presence of a token in the request headers.
 # If the token is present, it decodes it and retrieves the customer ID.
 # If the token is missing, expired, or invalid, it returns an error response.
-# If the token is valid, it calls the decorated function with the customer ID as an argument.
-# This allows the decorated function to access the customer ID for further processing.
-# The token_required decorator can be applied to any route that requires authentication.
-# This utility function is used to encode a JWT token for user authentication.
-# It includes a decorator to protect routes that require a valid token.
-# The token is signed with a secret key to ensure its integrity and authenticity.
-# The token includes expiration time, issued at time, and subject (user ID).
