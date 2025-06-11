@@ -1,6 +1,7 @@
 from flask import request, jsonify
+from sqlalchemy import func
 from app.extensions import db, ma, jwt, limiter, cache
-from app.models import Mechanic
+from app.models import Mechanic, mechanic_ticket
 from app.blueprints.mechanics import mechanics_bp
 from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
 
@@ -31,6 +32,8 @@ def get_mechanic(id):
     mechanic = Mechanic.query.get_or_404(id)
     return mechanic_schema.jsonify(mechanic)
 
+
+
 # Update a mechanic
 @mechanics_bp.route('/<int:id>', methods=['PUT'])
 def update_mechanic(id):
@@ -48,3 +51,17 @@ def delete_mechanic(id):
     db.session.delete(mechanic)
     db.session.commit()
     return jsonify({"message": f"Mechanic {id} deleted successfully"})
+
+
+# Get mechanics ordered by ticket count
+@mechanics_bp.route('/most-tickets', methods=['GET'])
+def get_mechanics_by_ticket_count():
+    mechanics = (
+        db.session.query(Mechanic)
+        .outerjoin(mechanic_ticket, Mechanic.id == mechanic_ticket.c.mechanic_id)
+        .group_by(Mechanic.id)
+        .order_by(func.count(mechanic_ticket.c.ticket_id).desc())
+        .all()
+    )
+
+    return mechanics_schema.jsonify(mechanics), 200

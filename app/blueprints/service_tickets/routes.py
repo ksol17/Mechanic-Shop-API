@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from marshmallow import ValidationError
 from app.extensions import db, ma, jwt, limiter, cache
-from app.models import ServiceTicket, Mechanic, MechanicTicket
+from app.models import ServiceTicket, Mechanic
 from app.blueprints.service_tickets import service_tickets_bp
 from app.blueprints.service_tickets.schemas import service_ticket_schema, service_tickets_schema
 
@@ -32,12 +32,17 @@ def assign_mechanic_to_ticket():
     if not mechanic_id or not ticket_id:
         return jsonify({"error": "mechanic_id and ticket_id are required"}), 400
 
-    # Assuming your join table model is MechanicTicket
-    mechanic_ticket = MechanicTicket(mechanic_id=mechanic_id, ticket_id=ticket_id)
-    db.session.add(mechanic_ticket)
-    db.session.commit()
+    mechanic = Mechanic.query.get(mechanic_id)
+    ticket = ServiceTicket.query.get(ticket_id)
 
-    return jsonify({"message": "Mechanic assigned to ticket successfully!"}), 201
+    if not mechanic or not ticket:
+        return jsonify({"error": "Mechanic or Ticket not found"}), 404
+
+    if mechanic not in ticket.mechanics:
+        ticket.mechanics.append(mechanic)
+        db.session.commit()
+
+    return jsonify({"message": "Mechanic assigned to ticket successfully"}), 200
 
 # Remove a mechanic from a ticket
 @service_tickets_bp.route('/<int:ticket_id>/remove-mechanic/<int:mechanic_id>', methods=['PUT'])
