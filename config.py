@@ -6,10 +6,10 @@ import os
 
 
 class DevelopmentConfig:
-    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
+    DEBUG = True
+    SECRET_KEY = 'supersecretkey'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///mechanic_shop.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.getenv("SECRET_KEY")
-    RATELIMIT_STORAGE_URL = os.getenv("RATELIMIT_STORAGE_URL")
     
 class TestingConfig:
     pass
