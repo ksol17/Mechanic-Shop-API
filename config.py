@@ -12,7 +12,10 @@ class DevelopmentConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
 class TestingConfig:
-    pass
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY= 'test'
     
 
 class ProductionConfig:

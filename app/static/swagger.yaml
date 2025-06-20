@@ -523,34 +523,32 @@ definitions:
         type: "string" 
 
 
-  CreateMechanicPayload:
-    type: "object"
-    properties:
-      name:
-        type: "string"
-      email:
-        type: "string"
-      phone:
-        type: "string"
-      password:
-        type: "string"
+  MechanicPayload:
+    type: object
     required:
       - name
       - email
       - phone
-      - password
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      phone:
+        type: string
 
-  CreateMechanicResponse:
-    type: "object"
+
+  MechanicResponse:
+    type: object
     properties:
       id:
-        type: "integer"
+        type: integer
       name:
-        type: "string"
+        type: string
       email:
-        type: "string"
+        type: string
       phone:
-        type: "string"
+        type: string
 
   AllMechanics:
     type: "array"

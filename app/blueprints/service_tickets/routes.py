@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 from app.extensions import db, ma, jwt, limiter, cache
 from app.models import ServiceTicket, Mechanic
@@ -9,18 +9,37 @@ from app.blueprints.service_tickets.schemas import service_ticket_schema, servic
 @service_tickets_bp.route('/', methods=['POST'])
 def create_service_ticket():
     data = request.get_json()
-    ticket = ServiceTicket(
+    required_fields = ['customer_id', 'mechanic_id', 'description', 'status']
+    if not data or not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    service_ticket = ServiceTicket(
+        customer_id=data['customer_id'],
+        mechanic_id=data['mechanic_id'],
         description=data['description'],
-        customer_id=data['customer_id']
+        status=data['status']
     )
-    db.session.add(ticket)
-    db.session.commit()
-    return service_ticket_schema.jsonify(ticket), 201
+    try:
+        db.session.add(service_ticket)
+        db.session.commit()
+        return service_ticket_schema.jsonify(service_ticket), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 # Get all service tickets
 @service_tickets_bp.route('/', methods=['GET'])
 def get_service_tickets():
-    return service_tickets_schema.jsonify(ServiceTicket.query.all())
+    tickets = ServiceTicket.query.all()
+    return service_tickets_schema.jsonify(tickets), 200
+
+# Get a single service ticket by ID
+@service_tickets_bp.route('/<int:id>', methods=['GET'])
+def get_service_ticket(id):
+    ticket = ServiceTicket.query.get(id)
+    if not ticket:
+        return jsonify({"error": "Service ticket not found"}), 404
+    return service_ticket_schema.jsonify(ticket), 200
 
 # Assign a mechanic to a ticket
 @service_tickets_bp.route('/assign_mechanic', methods=['POST'])
@@ -44,17 +63,35 @@ def assign_mechanic_to_ticket():
 
     return jsonify({"message": "Mechanic assigned to ticket successfully"}), 200
 
-# Remove a mechanic from a ticket
-@service_tickets_bp.route('/<int:ticket_id>/remove-mechanic/<int:mechanic_id>', methods=['PUT'])
-def remove_mechanic(ticket_id, mechanic_id):
-    ticket = ServiceTicket.query.get(ticket_id)
-    mechanic = Mechanic.query.get(mechanic_id)
+# Update a service ticket
+@service_tickets_bp.route('/<int:id>', methods=['PUT'])
+def update_service_ticket(id):
+    ticket = ServiceTicket.query.get(id)
+    if not ticket:
+        return jsonify({"error": "Service ticket not found"}), 404
 
-    if not ticket or not mechanic:
-        return jsonify({"error": "Ticket or Mechanic not found"}), 404
-
-    if mechanic in ticket.mechanics:
-        ticket.mechanics.remove(mechanic)
+    data = request.get_json()
+    if 'description' in data:
+        ticket.description = data['description']
+    if 'status' in data:
+        ticket.status = data['status']
+    
+    try:
         db.session.commit()
+        return service_ticket_schema.jsonify(ticket), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
-    return service_ticket_schema.jsonify(ticket), 200
+
+
+# Delete a service ticket
+@service_tickets_bp.route('/<int:id>', methods=['DELETE'])
+def delete_service_ticket(id):
+    ticket = ServiceTicket.query.get(id)
+    if not ticket:
+        return jsonify({"error": "Service ticket not found"}), 404
+
+    db.session.delete(ticket)
+    db.session.commit()
+    return jsonify({"message": f"Service ticket {id} deleted successfully"}), 200
