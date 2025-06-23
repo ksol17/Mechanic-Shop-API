@@ -1,67 +1,78 @@
-from flask import request, jsonify
-from sqlalchemy import func
-from app.extensions import db, ma, jwt, limiter, cache
-from app.models import Mechanic, mechanic_ticket
+from flask import Blueprint, request, jsonify
+from app.extensions import db
+from app.models import Mechanic
 from app.blueprints.mechanics import mechanics_bp
-from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
 
 # Create a new mechanic
 @mechanics_bp.route('/', methods=['POST'])
 def create_mechanic():
     data = request.get_json()
+    required_fields = ['name', 'email']
+    if not data or not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
     mechanic = Mechanic(
         name=data['name'],
-        email=data['email'],
-        phone=data.get('phone'),
-        address=data.get('address'),
-        salary=data.get('salary')
+        email=data['email']
     )
     db.session.add(mechanic)
     db.session.commit()
-    return mechanic_schema.jsonify(mechanic), 201
+    return jsonify({
+        "id": mechanic.id,
+        "name": mechanic.name,
+        "email": mechanic.email
+    }), 201
 
-# Get all mechanics (with nested tickets)
+# Get all mechanics
 @mechanics_bp.route('/', methods=['GET'])
 def get_mechanics():
-    all_mechanics = Mechanic.query.all()
-    return mechanics_schema.jsonify(all_mechanics)
+    mechanics = Mechanic.query.all()
+    return jsonify([
+        {
+            "id": m.id,
+            "name": m.name,
+            "email": m.email
+        } for m in mechanics
+    ]), 200
 
-# Get a single mechanic by ID (with nested tickets)
+# Get a single mechanic by ID
 @mechanics_bp.route('/<int:id>', methods=['GET'])
 def get_mechanic(id):
-    mechanic = Mechanic.query.get_or_404(id)
-    return mechanic_schema.jsonify(mechanic)
-
-
+    mechanic = Mechanic.query.get(id)
+    if not mechanic:
+        return jsonify({"error": "Mechanic not found"}), 404
+    return jsonify({
+        "id": mechanic.id,
+        "name": mechanic.name,
+        "email": mechanic.email
+    }), 200
 
 # Update a mechanic
 @mechanics_bp.route('/<int:id>', methods=['PUT'])
 def update_mechanic(id):
-    mechanic = Mechanic.query.get_or_404(id)
+    mechanic = Mechanic.query.get(id)
+    if not mechanic:
+        return jsonify({"error": "Mechanic not found"}), 404
+
     data = request.get_json()
     mechanic.name = data.get('name', mechanic.name)
     mechanic.email = data.get('email', mechanic.email)
     db.session.commit()
-    return mechanic_schema.jsonify(mechanic)
+    return jsonify({
+        "id": mechanic.id,
+        "name": mechanic.name,
+        "email": mechanic.email
+    }), 200
 
 # Delete a mechanic
 @mechanics_bp.route('/<int:id>', methods=['DELETE'])
 def delete_mechanic(id):
-    mechanic = Mechanic.query.get_or_404(id)
+    mechanic = Mechanic.query.get(id)
+    if not mechanic:
+        return jsonify({"error": "Mechanic not found"}), 404
+
     db.session.delete(mechanic)
     db.session.commit()
-    return jsonify({"message": f"Mechanic {id} deleted successfully"})
+    return jsonify({"message": f"Mechanic {id} deleted successfully"}), 200
 
 
-# Get mechanics ordered by ticket count
-@mechanics_bp.route('/most-tickets', methods=['GET'])
-def get_mechanics_by_ticket_count():
-    mechanics = (
-        db.session.query(Mechanic)
-        .outerjoin(mechanic_ticket, Mechanic.id == mechanic_ticket.c.mechanic_id)
-        .group_by(Mechanic.id)
-        .order_by(func.count(mechanic_ticket.c.ticket_id).desc())
-        .all()
-    )
-
-    return mechanics_schema.jsonify(mechanics), 200

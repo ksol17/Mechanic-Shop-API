@@ -25,7 +25,7 @@ class Mechanic(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(db.String(255), nullable=False)
     email: Mapped[str] = mapped_column(db.String(360), nullable=False, unique=True)
-
+    
     service_tickets: Mapped[list['ServiceTicket']] = relationship(
         'ServiceTicket',
         secondary=mechanic_ticket,
@@ -37,6 +37,7 @@ class ServiceTicket(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     description: Mapped[str] = mapped_column(db.String(500), nullable=False)
+    status: Mapped[str] = mapped_column(db.String(50), nullable=False)
     customer_id: Mapped[int] = mapped_column(db.ForeignKey('customers.id'), nullable=False)
 
     customer: Mapped['Customer'] = relationship('Customer', back_populates='service_tickets')

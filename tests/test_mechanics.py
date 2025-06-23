@@ -1,32 +1,36 @@
 import unittest
+from sqlalchemy import text
 from app import create_app
 from config import TestingConfig
 
 class TestMechanics(unittest.TestCase):
     def setUp(self):
-        self.app = create_app(TestingConfig)  # ensure your app supports config modes
+        self.app = create_app(TestingConfig)
         self.client = self.app.test_client()
         with self.app.app_context():
-            pass  # Add any additional setup here if needed
-        
+            from app import db
+            db.create_all()
+            db.session.execute(text("DELETE FROM mechanic_ticket"))
+            db.session.execute(text("DELETE FROM service_tickets"))
+            db.session.execute(text("DELETE FROM mechanics"))
+            db.session.execute(text("DELETE FROM customers"))
+            db.session.commit()
 
-    # Positive test: create mechanic
     def test_create_mechanic_success(self):
         payload = {
-            "id": "1",
-            "name": "John Doe",
-            
+            "name": "Test Mechanic",
+            "email": "mechanic@example.com"
         }
         response = self.client.post('/mechanics/', json=payload)
         self.assertEqual(response.status_code, 201)
-        self.assertIn("John Doe", response.get_data(as_text=True))
+        self.assertIn("Test Mechanic", response.get_data(as_text=True))
 
 
     # Negative test: create mechanic with missing required field
     def test_create_mechanic_missing_field(self):
         payload = {
             "name": "Jane Doe"
-            # Missing 'specialization'
+            # Missing 'email', 'password', and 'phone'
         }
         response = self.client.post('/mechanics/', json=payload)
         self.assertEqual(response.status_code, 400)
@@ -36,15 +40,16 @@ class TestMechanics(unittest.TestCase):
     def test_get_mechanic_success(self):
         # First, create a mechanic
         payload = {
-            "name": "Get Mechanic",
-            "specialization": "Brakes"
+            "name": "Test Mechanic",
+            "email": "getmechanic@example.com"
+           
         }
         create_resp = self.client.post('/mechanics/', json=payload)
         mechanic_id = create_resp.get_json().get("id")
         # Now, get the mechanic
         response = self.client.get(f'/mechanics/{mechanic_id}')
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Get Mechanic", response.get_data(as_text=True))
+        self.assertIn("Test Mechanic", response.get_data(as_text=True))
 
     # Negative tests: get, update, and delete mechanic not found
     def test_get_mechanic_not_found(self):

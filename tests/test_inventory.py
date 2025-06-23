@@ -11,7 +11,7 @@ class TestInventory(unittest.TestCase):
     # Positive test: create inventory item
     def test_create_inventory_item_success(self):
         payload = {
-            "name": "Oil Filter",
+            "item_name": "Oil Filter",
             "quantity": 10,
             "price": 15.99
         }
@@ -22,7 +22,7 @@ class TestInventory(unittest.TestCase):
     # Negative test: create inventory item with missing required field
     def test_create_inventory_item_missing_field(self):
         payload = {
-            "name": "Brake Pad"
+            "item_name": "Brake Pad"
             # Missing 'quantity' and 'price'
         }
         response = self.client.post('/inventory/', json=payload)
@@ -31,7 +31,7 @@ class TestInventory(unittest.TestCase):
     # Positive test: get inventory item by ID
     def test_get_inventory_item_success(self):
         payload = {
-            "name": "Spark Plug",
+            "item_name": "Spark Plug",
             "quantity": 5,
             "price": 7.99
         }
@@ -49,7 +49,7 @@ class TestInventory(unittest.TestCase):
     # Negative test: update inventory item not found
     def test_update_inventory_item_not_found(self):
         payload = {
-            "name": "Updated Item",
+            "item_name": "Updated Item",
             "quantity": 20,
             "price": 19.99
         }

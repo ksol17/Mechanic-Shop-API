@@ -9,14 +9,23 @@ from app.blueprints.inventory.schemas import inventory_schema, inventories_schem
 @inventory_bp.route('/', methods=['POST'])
 def create_inventory_item():
     data = request.get_json()
+    required_fields = ['item_name', 'quantity', 'price']
+    if not data or not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
     item = Inventory(
-        item_name = data['item_name'],
-        quantity = data['quantity'],
-        price = data['price'])
-    
+        item_name=data['item_name'],
+        quantity=data['quantity'],
+        price=data['price']
+    )
     db.session.add(item)
     db.session.commit()
-    return inventory_schema.jsonify(item), 201
+    return jsonify({
+        "id": item.id,
+        "item_name": item.item_name,
+        "quantity": item.quantity,
+        "price": item.price
+    }), 201
 
 # Get all inventory items
 @inventory_bp.route('/', methods=['GET'])
