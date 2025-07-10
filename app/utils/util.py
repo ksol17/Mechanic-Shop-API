@@ -2,12 +2,10 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from functools import wraps
 from flask import request, jsonify, current_app
+import os
 
-# This file contains utility functions for the application.
-# It includes a function to encode a JWT token for user authentication.
-# The token includes expiration time, issued at time, and subject (user ID).
-# The token is signed with a secret key to ensure its integrity and authenticity.
-SECRET_KEY = "super secret secrets"
+
+SECRET_KEY = os.environ.get('SECRET_KEY') or "super secret secrets"
 
 def encode_token(customer_id): #using unique pieces of info to make our tokens user specific
     payload = {
