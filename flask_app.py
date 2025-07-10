@@ -3,7 +3,8 @@ from app.models import db
 from config import ProductionConfig
 
 
-app = create_app('ProductionConfig')
+
+app = create_app(config_class='ProductionConfig')
 
 with app.app_context():
     db.create_all()  # Create database tables

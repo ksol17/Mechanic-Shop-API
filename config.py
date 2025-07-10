@@ -21,5 +21,7 @@ class TestingConfig:
     
 
 class ProductionConfig:
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
+    debug = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///mechanic_shop.db'
     CACHE_TYPE = 'SimpleCache'  # Use SimpleCache for production
+    SECRET_KEY = os.environ.get('SECRET_KEY')
