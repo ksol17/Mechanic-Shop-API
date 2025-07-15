@@ -33,6 +33,7 @@ psycopg2==2.9.10
 pyasn1==0.4.8
 Pygments
 PyJWT==2.10.1
+python-dotenv
 python-jose==3.4.0
 PyYAML==6.0.2
 redis==6.2.0
