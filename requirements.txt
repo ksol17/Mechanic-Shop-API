@@ -31,7 +31,7 @@ ordered-set==4.1.0
 packaging==25.0
 psycopg2==2.9.10
 pyasn1==0.4.8
-Pygments==2.9.1
+Pygments
 PyJWT==2.10.1
 python-jose==3.4.0
 PyYAML==6.0.2
