@@ -17,3 +17,5 @@ customers_schema = CustomerSchema(many=True)
 class CustomerLoginSchema(Schema):
     email = fields.Str(required=True)
     password = fields.Str(required=True)
+
+customer_login_schema = CustomerLoginSchema()
