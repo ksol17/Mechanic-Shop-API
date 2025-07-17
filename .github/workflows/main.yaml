@@ -35,6 +35,12 @@ jobs:
           echo "Working Directory: $(pwd)"
           echo "Contents of Working Directory: $(ls -l)"
           echo "Contents of site-packages: $(ls -l venv/lib/python*/site-packages)"
+      
+      - name: Run database migrations
+        run: |
+          source venv/bin/activate
+          python -c "from app import create_app, db; app = create_app(); with app.app_context(): db.create_all()"   
+          
 
       - name: Run unittests
         run: |
