@@ -1,16 +1,12 @@
 from app.extensions import db, ma, jwt, limiter, cache
+from marshmallow import Schema, fields
 
 from app.models import Mechanic
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
-class MechanicSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Mechanic
-        load_instance = True
-        
-
-  
-
+class MechanicSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    email = fields.Str(required=True)
 
 # Schema instances
 mechanic_schema = MechanicSchema()
