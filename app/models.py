@@ -1,5 +1,6 @@
 from app.extensions import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from marshmallow import Schema, fields
 
 class Customer(db.Model):
     __tablename__ = 'customers'

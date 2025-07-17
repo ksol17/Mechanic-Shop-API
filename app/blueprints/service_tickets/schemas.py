@@ -1,7 +1,7 @@
 from app.extensions import ma, jwt, limiter, cache
 from app.models import ServiceTicket
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields
+from marshmallow import schema, fields
 
 
 

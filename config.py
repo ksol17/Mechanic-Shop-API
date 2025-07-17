@@ -2,6 +2,13 @@
 import os
 
 
+
+# Load .env only in development
+if os.environ.get("FLASK_ENV") == "development":
+    from dotenv import load_dotenv
+    load_dotenv()
+
+
 class DevelopmentConfig:
     DEBUG = True
     SECRET_KEY = 'supersecretkey'
