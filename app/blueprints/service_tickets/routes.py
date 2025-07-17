@@ -37,6 +37,9 @@ def create_service_ticket():
         db.session.add(ticket)
         db.session.commit()
 
+        ticket_id = ticket.id  # Get the ID of the newly created ticket
+        print("Created ticket ID:", ticket_id)  # Print the ticket ID for debugging
+
         return jsonify(service_ticket_schema.dump(ticket)), 201
 
     except Exception as e:
@@ -100,6 +103,8 @@ def update_service_ticket(id):
             return jsonify({"error": "One or more mechanic IDs are invalid"}), 400
         ticket.mechanics = mechanics
 
+        
+
     db.session.commit()
     return jsonify({
         "id": ticket.id,
@@ -108,7 +113,7 @@ def update_service_ticket(id):
         
     }), 200
 
-
+    
 # Delete a service ticket
 @service_tickets_bp.route('/<int:id>', methods=['DELETE'])
 def delete_service_ticket(id):
