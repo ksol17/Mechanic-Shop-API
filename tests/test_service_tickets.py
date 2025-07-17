@@ -9,6 +9,7 @@ class TestServiceTickets(unittest.TestCase):
         self.client = self.app.test_client()
         with self.app.app_context():
             from app import db
+            db.drop_all()
             db.create_all()
             # Clear tables for a clean test environment
             db.session.execute(text("DELETE FROM mechanic_ticket"))
@@ -28,7 +29,7 @@ class TestServiceTickets(unittest.TestCase):
                 "email": "mechanic@example.com"
             })
             self.customer_id = cust_resp.get_json().get("id")
-            self.mechanic_id= mech_resp.get_json().get("id")
+            self.mechanic_id = mech_resp.get_json().get("id")
 
     def test_create_service_ticket_success(self):
         payload = {
@@ -38,10 +39,9 @@ class TestServiceTickets(unittest.TestCase):
             "status": "open"
         }
         response = self.client.post('/service_tickets/', json=payload)
+        print("Create service ticket response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 201)
         self.assertIn("Oil change", response.get_data(as_text=True))
-
-
 
     def test_get_service_ticket_success(self):
         # First, create a ticket
@@ -54,11 +54,13 @@ class TestServiceTickets(unittest.TestCase):
         create_resp = self.client.post('/service_tickets/', json=payload)
         ticket_id = create_resp.get_json().get("id")
         response = self.client.get(f'/service_tickets/{ticket_id}')
+        print("Get service ticket response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 200)
         self.assertIn("Brake repair", response.get_data(as_text=True))
 
     def test_get_service_ticket_not_found(self):
         response = self.client.get('/service_tickets/99999')
+        print("Get non-existent service ticket response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 404)
 
     def test_update_service_ticket_success(self):
@@ -77,6 +79,7 @@ class TestServiceTickets(unittest.TestCase):
             "customer_id": self.customer_id
         }
         response = self.client.put(f'/service_tickets/{ticket_id}', json=update_payload)
+        print("Update service ticket response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 200)
         self.assertIn("Tire rotation and balance", response.get_data(as_text=True))
 
@@ -84,9 +87,10 @@ class TestServiceTickets(unittest.TestCase):
         update_payload = {
             "description": "Updated description",
             "status": "closed",
-            "customer_id": self.customer_id}
-        
+            "customer_id": self.customer_id
+        }
         response = self.client.put('/service_tickets/99999', json=update_payload)
+        print("Update non-existent service ticket response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 404)
 
     def test_delete_service_ticket_success(self):
@@ -98,14 +102,15 @@ class TestServiceTickets(unittest.TestCase):
             "status": "open"
         }
         create_resp = self.client.post('/service_tickets/', json=payload)
-        print("Create Response:", create_resp.get_json())
         ticket_id = create_resp.get_json().get("id")
         response = self.client.delete(f'/service_tickets/{ticket_id}')
+        print("Delete service ticket response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 200)
         self.assertIn("deleted successfully", response.get_data(as_text=True))
 
     def test_delete_service_ticket_not_found(self):
         response = self.client.delete('/service_tickets/99999')
+        print("Delete non-existent service ticket response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 404)
 
 if __name__ == "__main__":

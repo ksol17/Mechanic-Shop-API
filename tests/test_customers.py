@@ -4,12 +4,13 @@ from config import TestingConfig
 
 class TestCustomers(unittest.TestCase):
     def setUp(self):
-        self.app = create_app(TestingConfig)  # ensure your app supports config modes
+        self.app = create_app(TestingConfig)
         self.client = self.app.test_client()
         with self.app.app_context():
             from app import db
+            db.drop_all()
             db.create_all()
-    
+
     # Positive test: create customer
     def test_create_customer_success(self):
         payload = {
@@ -19,8 +20,9 @@ class TestCustomers(unittest.TestCase):
             "password": "123"
         }
         response = self.client.post('/customers/', json=payload)
-        print(response.get_json())  # Debugging line to see the response
+        print("Create customer response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 201)
+        self.assertIn("id", response.get_json())
         
     # Negative test: create customer with missing required field
     def test_create_customer_missing_field(self):
@@ -28,11 +30,13 @@ class TestCustomers(unittest.TestCase):
             "name": "Bob"
         }
         response = self.client.post('/customers/', json=payload)
+        print("Missing field response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 400)
 
     # Negative test: get non-existent customer
     def test_get_customer_not_found(self):
         response = self.client.get('/customers/99999')
+        print("Get non-existent customer response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 404)
 
 

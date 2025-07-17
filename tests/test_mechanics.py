@@ -1,5 +1,4 @@
 import unittest
-from sqlalchemy import text
 from app import create_app
 from config import TestingConfig
 
@@ -9,12 +8,8 @@ class TestMechanics(unittest.TestCase):
         self.client = self.app.test_client()
         with self.app.app_context():
             from app import db
+            db.drop_all()
             db.create_all()
-            db.session.execute(text("DELETE FROM mechanic_ticket"))
-            db.session.execute(text("DELETE FROM service_tickets"))
-            db.session.execute(text("DELETE FROM mechanics"))
-            db.session.execute(text("DELETE FROM customers"))
-            db.session.commit()
 
     def test_create_mechanic_success(self):
         payload = {
@@ -22,52 +17,48 @@ class TestMechanics(unittest.TestCase):
             "email": "mechanic@example.com"
         }
         response = self.client.post('/mechanics/', json=payload)
+        print("Create mechanic response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 201)
-        self.assertIn("Test Mechanic", response.get_data(as_text=True))
+        self.assertIn("id", response.get_json())
 
-
-    # Negative test: create mechanic with missing required field
     def test_create_mechanic_missing_field(self):
         payload = {
             "name": "Jane Doe"
-            # Missing 'email', 'password', and 'phone'
+            # Missing 'email'
         }
         response = self.client.post('/mechanics/', json=payload)
+        print("Missing field response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 400)
 
-
-    # Positive test: get mechanic 
     def test_get_mechanic_success(self):
         # First, create a mechanic
         payload = {
             "name": "Test Mechanic",
             "email": "getmechanic@example.com"
-           
         }
         create_resp = self.client.post('/mechanics/', json=payload)
         mechanic_id = create_resp.get_json().get("id")
-        # Now, get the mechanic
         response = self.client.get(f'/mechanics/{mechanic_id}')
+        print("Get mechanic response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 200)
         self.assertIn("Test Mechanic", response.get_data(as_text=True))
 
-    # Negative tests: get, update, and delete mechanic not found
     def test_get_mechanic_not_found(self):
         response = self.client.get('/mechanics/99999')
+        print("Get non-existent mechanic response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 404)
 
-    # Negative test: update mechanic not found
     def test_update_mechanic_not_found(self):
         payload = {
-            "id": "100",
             "name": "John Doe"
         }
         response = self.client.put('/mechanics/99999', json=payload)
+        print("Update non-existent mechanic response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 404)
 
-    # Negative test: delete mechanic not found
     def test_delete_mechanic_not_found(self):
         response = self.client.delete('/mechanics/99999')
+        print("Delete non-existent mechanic response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 404)
 
 if __name__ == "__main__":

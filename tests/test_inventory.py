@@ -6,7 +6,10 @@ class TestInventory(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestingConfig)
         self.client = self.app.test_client()
-
+        with self.app.app_context():
+            from app import db
+            db.drop_all()
+            db.create_all()
 
     # Positive test: create inventory item
     def test_create_inventory_item_success(self):
@@ -17,7 +20,7 @@ class TestInventory(unittest.TestCase):
         }
         response = self.client.post('/inventory/', json=payload)
         self.assertEqual(response.status_code, 201)
-        self.assertIn("Oil Filter", response.get_data(as_text=True))
+        self.assertIn("id", response.get_json())
 
     # Negative test: create inventory item with missing required field
     def test_create_inventory_item_missing_field(self):
