@@ -31,13 +31,13 @@ def create_inventory_item():
 @inventory_bp.route('/', methods=['GET'])
 def get_inventory_items():
     all_items = Inventory.query.all()
-    return inventories_schema.jsonify(all_items)
+    return jsonify(inventory_schema.dump(all_items, many=True)), 200
 
 # Get a single inventory item by ID
 @inventory_bp.route('/<int:id>', methods=['GET'])
 def get_inventory_item(id):
     item = Inventory.query.get_or_404(id)
-    return inventory_schema.jsonify(item)
+    return jsonify(inventory_schema.dump(item))
 
 # Update an inventory item
 @inventory_bp.route('/<int:id>', methods=['PUT'])
@@ -50,7 +50,7 @@ def update_inventory_item(id):
     
     
     db.session.commit()
-    return inventory_schema.jsonify(item)
+    return jsonify(inventory_schema.dump(item))
 
 # Delete an inventory item
 @inventory_bp.route('/<int:id>', methods=['DELETE'])

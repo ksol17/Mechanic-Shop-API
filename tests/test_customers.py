@@ -22,7 +22,13 @@ class TestCustomers(unittest.TestCase):
         response = self.client.post('/customers/', json=payload)
         print("Create customer response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 201)
-        self.assertIn("id", response.get_json())
+        data = response.get_json()
+        self.assertIsInstance(data, dict)
+        self.assertIn("id", data)
+        self.assertEqual(data["name"], "Test Customer")
+        self.assertEqual(data["email"], "test@email.com")
+        self.assertEqual(data["phone"], "1234567890")
+        self.assertNotIn("password", data)  # Password should not be returned
         
     # Negative test: create customer with missing required field
     def test_create_customer_missing_field(self):
@@ -32,12 +38,18 @@ class TestCustomers(unittest.TestCase):
         response = self.client.post('/customers/', json=payload)
         print("Missing field response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertIn("error", data)
+        self.assertEqual(data["error"], "Missing required fields")
 
     # Negative test: get non-existent customer
     def test_get_customer_not_found(self):
         response = self.client.get('/customers/99999')
         print("Get non-existent customer response:", response.status_code, response.get_json())
         self.assertEqual(response.status_code, 404)
+        data = response.get_json()
+        self.assertIn("error", data)
+        self.assertEqual(data["error"], "Customer not found")
 
 
 

@@ -36,7 +36,7 @@ def create_customer():
     try:
         db.session.add(new_customer)
         db.session.commit()
-        return customer_schema.jsonify(new_customer), 201
+        return jsonify(customer_schema.dump(new_customer)), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
@@ -73,7 +73,7 @@ def get_customers():
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
         pagination = Customer.query.paginate(page=page, per_page=per_page, error_out=False)
-        return customers_schema.jsonify(pagination.items), 200
+        return jsonify(customers_schema.dump(pagination.items)), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
@@ -85,16 +85,13 @@ def get_customers():
 def get_customer(id):
     customer = Customer.query.get(id)
     if customer:
-        return customer_schema.jsonify(customer), 200
+        return jsonify(customer_schema.dump(customer)), 200
     return jsonify({"error": "Customer not found"}), 404
 
 
 # Update a customer 
 @customers_bp.route('/<int:id>', methods=['PUT'])
-def update_customer(customer_id, id):
-    if customer_id != id:
-        return jsonify({"message": "Unauthorized"}), 403
-
+def update_customer(id):
     customer = Customer.query.get(id)
     if not customer:
         return jsonify({"error": "Customer not found"}), 404
@@ -108,7 +105,7 @@ def update_customer(customer_id, id):
         customer.password = generate_password_hash(data['password'])
 
     db.session.commit()
-    return customer_schema.jsonify(customer), 200
+    return jsonify(customer_schema.dump(customer)), 200
 
 
 
