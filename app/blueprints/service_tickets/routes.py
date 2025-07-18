@@ -75,7 +75,7 @@ def assign_mechanic_to_ticket():
 # Update a service ticket
 @service_tickets_bp.route('/<int:id>', methods=['PUT'])
 def update_service_ticket(id):
-    ticket = db.session.get(ServiceTicket, id)
+    ticket = ServiceTicket.query.get(id)
     if not ticket:
         return jsonify({"error": "Service ticket not found"}), 404
 
