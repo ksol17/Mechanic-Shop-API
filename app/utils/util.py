@@ -24,8 +24,6 @@ def encode_token(customer_id): #using unique pieces of info to make our tokens u
 # HS256 is a hashing algorith to encode th token.
 # SECRET_KEY is a key specific to your application used to "sign" tokens.  This prevents forgery of tokens.
 
-# DISCLAIMER:
-# When creating the payload it is important to follow thesame naming convention for the dictionary keys "exp", "iat", "sub". Not only are these keys a part of standard token naming conventions, but some of the built-in token validators require thse as well and changing them can lead to errors.
 
 # Token required decorator
 def token_required(f):
