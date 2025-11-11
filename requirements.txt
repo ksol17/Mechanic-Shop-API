@@ -30,6 +30,7 @@ psycopg2-binary==2.9.9
 pyasn1==0.6.1
 Pygments==2.19.2
 PyJWT==2.10.1
+python-dotenv==1.1.1
 python-jose==3.3.0
 rich==13.9.4
 rsa==4.9.1
@@ -37,5 +38,4 @@ six==1.17.0
 SQLAlchemy==2.0.41
 typing_extensions==4.14.1
 Werkzeug==2.3.8
-wrapt==1.16.0
-
+wrapt==1.17.2

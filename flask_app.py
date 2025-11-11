@@ -1,11 +1,14 @@
-from app import create_app, db
-from config import ProductionConfig
+from app import create_app
+from app.models import db
 
 
 
-app = create_app(ProductionConfig)
+
+app = create_app('ProductionConfig')
+
 with app.app_context():
     db.create_all()
+
 
 
 #gunicorn flask_app:app
