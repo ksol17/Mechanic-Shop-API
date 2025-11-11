@@ -37,4 +37,4 @@ six==1.17.0
 SQLAlchemy==2.0.41
 typing_extensions==4.14.1
 Werkzeug==2.3.8
-wrapt==1.17.2
+
