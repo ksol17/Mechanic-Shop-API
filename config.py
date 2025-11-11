@@ -17,7 +17,7 @@ class DevelopmentConfig:
 
 class TestingConfig:
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///testing.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY= 'test'
     CACHE_TYPE = 'SimpleCache'  # Disable caching in tests
@@ -25,7 +25,7 @@ class TestingConfig:
 
 class ProductionConfig:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'supersecretkey')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///Mechanic_Shop.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CACHE_TYPE = 'SimpleCache'  # Use SimpleCache for production
 

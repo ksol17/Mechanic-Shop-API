@@ -19,7 +19,7 @@ def encode_token(customer_id): #using unique pieces of info to make our tokens u
 
 
 # The token will expire after 0 days and 1 hour(exp).
-# iat is the time the token is "issued at".
+# iat is the time the token is "issued at"
 # the sub claim (subject)contains the user's ID which needs to be converted to a string.
 # HS256 is a hashing algorith to encode th token.
 # SECRET_KEY is a key specific to your application used to "sign" tokens.  This prevents forgery of tokens.
