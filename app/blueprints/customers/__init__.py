@@ -2,5 +2,6 @@ from flask import Blueprint
 
 customers_bp = Blueprint('customers', __name__)
 
-from . import routes
-
+@customers_bp.route('/')
+def index():
+    return "Customers Blueprint!"
