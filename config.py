@@ -21,4 +21,3 @@ class ProductionConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CACHE_TYPE = 'SimpleCache'
     SECRET_KEY = os.getenv("SECRET_KEY")
-'
