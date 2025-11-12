@@ -3,19 +3,19 @@ import os
 from app import create_app, db
 from config import ProductionConfig, DevelopmentConfig
 
-# Choose the correct env file
-env_file = '.env.production' if os.getenv('FLASK_ENV') == 'production' else '.env.development'
-load_dotenv(env_file)
 
-# SELECT CONFIG
-config = ProductionConfig if os.getenv('FLASK_ENV') == 'production' else DevelopmentConfig
+# Load .env for local development
+load_dotenv()
 
-# Create flask app
+# Pick config based on FLASK_ENV
+env = os.getenv("FLASK_ENV", "development").lower()
+config = ProductionConfig if env == "production" else DevelopmentConfig
+
+# Create Flask app
 app = create_app(config)
 
-# Optional: create tables if they don't exist
+# Optional: create tables if they don’t exist
 with app.app_context():
     db.create_all()
-
 
 #gunicorn flask_app:app
