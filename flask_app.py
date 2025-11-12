@@ -1,29 +1,25 @@
 from dotenv import load_dotenv
 import os
 from app import create_app, db
-from config import  DevelopmentConfig, TestingConfig, ProductionConfig
+from config import DevelopmentConfig, ProductionConfig
 
+# Choose env file
+env_file = ".env.production" if os.getenv("FLASK_ENV") == "production" else ".env.development"
+load_dotenv(env_file)
 
-# Load environment variables from .env file
-load_dotenv()
+# Determine environment
+env = os.getenv("FLASK_ENV", "development").lower()
 
-# Determine the environment
-env = os.getenv('FLASK_ENV', 'development').lower()
+# Pick config class
+config = ProductionConfig if env == "production" else DevelopmentConfig
 
-# Pick configuration based on environment
-if env == 'production':
-    config = ProductionConfig
-elif env == 'testing':
-    config = TestingConfig
-else:
-    config = DevelopmentConfig
-
-# Create Flask app using selected configuration
+# Create Flask app
 app = create_app(config)
 
-# Initialize database tables if needed(Production environment should handle migrations separately)
+# Initialize database tables (optional)
 with app.app_context():
     db.create_all()
-    
+
+
 
 #gunicorn flask_app:app
