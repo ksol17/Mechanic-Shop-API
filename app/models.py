@@ -1,4 +1,4 @@
-from app.extensions import db
+from app import db
 
 # Association table for many-to-many between mechanics and service tickets
 mechanic_ticket = db.Table(
