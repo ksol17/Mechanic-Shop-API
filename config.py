@@ -2,12 +2,14 @@
 import os
 
 class DevelopmentConfig:
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:Preciosa16!@localhost/mechanic_shop_db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URI', 'sqlite:///Mechanic_Shop.db')
     DEBUG = True
     CACHE_TYPE = 'SimpleCache'  
 
 class TestingConfig:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///testing.db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "TEST_DATABASE_URI", "sqlite:///testing.db"
+    )
     DEBUG = True
     CACHE_TYPE = 'SimpleCache'
 
