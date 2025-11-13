@@ -31,6 +31,7 @@ psycopg2-binary==2.9.9
 pyasn1==0.6.1
 Pygments==2.19.2
 PyJWT==2.10.1
+python-dotenv==1.0.0
 python-jose==3.3.0
 rich==13.9.4
 rsa==4.9.1
