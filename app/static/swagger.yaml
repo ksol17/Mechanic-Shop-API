@@ -10,6 +10,9 @@ consumes:
   - "application/json"
 produces:
   - "application/json"
+servers:
+  - url: "https://mechanic-shop-api-ml83.onrender.com"
+    description: "Production server"
 
 securityDefinitions:
   bearerAuth:
