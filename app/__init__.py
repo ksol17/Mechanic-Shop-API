@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
@@ -39,6 +40,9 @@ def create_app(config_class):
             "SQLALCHEMY_DATABASE_URI", "sqlite:///Mechanic_Shop.db"
         )
 
+    # Enable CORS
+    CORS(app)
+    
     # Initialize extensions with app
     db.init_app(app)
     ma.init_app(app)
