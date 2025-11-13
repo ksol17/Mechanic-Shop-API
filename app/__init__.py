@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -6,6 +7,11 @@ from flask_limiter import Limiter
 from flask_caching import Cache
 from flask_migrate import Migrate
 from flask_swagger_ui import get_swaggerui_blueprint
+from dotenv import load_dotenv
+
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -29,6 +35,12 @@ def create_app(config_class):
 
     # Load configuration
     app.config.from_object(config_class)
+
+    # Ensure database URI exists, otherwise use a fallback for local use
+    if not app.config.get("SQLALCHEMY_DATABASE_URI"):
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+            "SQLALCHEMY_DATABASE_URI", "sqlite:///Mechanic_Shop.db"
+        )
 
     # Initialize extensions with app
     db.init_app(app)
